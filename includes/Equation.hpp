@@ -9,7 +9,9 @@
 class Equation
 {
 	private:
+		typedef Term::t_coef	t_coef;
 		std::string _original;
+		int	_degree;
 		static const std::string _valid_chars;
 		static const std::string _parser_chars;
 		std::vector<Term> _terms;
@@ -42,7 +44,6 @@ class Equation
 
 		void _check_equation(std::string &s);
 
-		void _check_degree(void);
 
 		/*
 		** Parse
@@ -59,20 +60,29 @@ class Equation
 		/*
 		** Steps
 		*/
+		void __remove_empty_coef(int i);
+		void __insert_missing_term(int i);
 		void _switch_rightside(void);
-
 		static bool __sort_fn(Term &t1, Term &t2);
-		
 		void _sort();
-
 		bool __chk_equal_exp();
-
 		void __sum_terms(Term &t1, Term &t2);
-
 		void _reduce();
 
-		void _solve();
 
+
+
+		/*
+		** Solve
+		*/
+		void _check_degree(void);
+		void _check_multiple_solutions(void);
+
+		void __baskhara(t_coef a, t_coef b, t_coef discriminant);
+		t_coef __discriminant(t_coef a, t_coef b, t_coef c);
+		void _solve_quadratic(void);
+		void _solve_linear(void);
+		void _solve(void);
 
 		// Exceptions
 		class EquationInvalid : public std::exception {
@@ -82,6 +92,13 @@ class Equation
 			virtual const char* what() const throw();
 		};
 		class InvalidDegree : public std::exception {
+			virtual const char* what() const throw();
+		};
+		class MultipleSolutions : public std::exception {
+			virtual const char* what() const throw();
+		};
+
+		class NoSolutions : public std::exception {
 			virtual const char* what() const throw();
 		};
 };

@@ -5,7 +5,7 @@
 # include <string>
 # include <sstream>
 # include <iostream>
-# include "Fixed.hpp"
+# include "Double.hpp"
 
 # define LEFT_SIDE_TERM 0
 # define RIGHT_SIDE_TERM 1
@@ -16,7 +16,7 @@ class Term
 {
 	public:
 	
-		typedef Fixed t_coef;
+		typedef Double t_coef;
 		typedef long long int t_exp;
 
 		// Constructors
@@ -32,6 +32,7 @@ class Term
 		Term & operator=(const Term &);
 		
 		// Getters / Setters
+		t_coef getSignedCoefficient() const;
 		t_coef getCoefficient() const;
 		t_exp getExponent() const;
 		char getSide() const;

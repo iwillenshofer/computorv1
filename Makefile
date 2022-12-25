@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: iwillens <iwillens@student.42sp.org.br>    +#+  +:+       +#+         #
+#    By: iwillens <iwillens@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/07/23 17:38:02 by iwillens          #+#    #+#              #
-#    Updated: 2022/12/20 21:50:05 by iwillens         ###   ########.fr        #
+#    Updated: 2022/12/23 16:22:21 by iwillens         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,12 +21,12 @@ INC_DIR = ./includes
 
 INCLUDES = ${INC_DIR}/Equation.hpp \
 			${INC_DIR}/Term.hpp \
-			${INC_DIR}/Fixed.hpp
+			${INC_DIR}/Double.hpp
 
 SRCS = main.cpp \
 	${SRC_DIR}/Equation.cpp \
 	${SRC_DIR}/Term.cpp \
-	${SRC_DIR}/Fixed.cpp
+	${SRC_DIR}/Double.cpp
 
 
 

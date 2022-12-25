@@ -14,7 +14,6 @@ Term::Term(std::string s, char signal = POSITIVE_TERM, char side = LEFT_SIDE_TER
 :_side(side), _signal(signal), _original(s)
 {
 	this->_parse(s);
-//	std::cout << *this << std::endl;
 }
 
 Term::Term(const Term &copy)
@@ -27,10 +26,7 @@ Term::Term(const Term &copy)
 }
 
 // Destructor
-Term::~Term()
-{
-//	std::cout << "\e[0;31mDestructor called of Term\e[0m" << std::endl;
-}
+Term::~Term() {}
 
 
 // Operators
@@ -46,6 +42,12 @@ Term & Term::operator=(const Term &assign)
 
 
 // Getters / Setters
+
+
+Term::t_coef Term::getSignedCoefficient() const
+{
+	return _coefficient * (_signal == POSITIVE_TERM ? 1.0 : -1.0);
+}
 
 Term::t_coef Term::getCoefficient() const
 {
@@ -129,7 +131,20 @@ void Term::__check_exponent(std::string &s)
 	if (pos == 0 || pos == s.length() - 1)
 		throw Term::TermInvalid();
 	if (pos == std::string::npos && s.find('X') != std::string::npos)
-		_exponent = 1;
+	{
+		pos = s.find('X');
+		if (pos == s.length() - 1)
+			_exponent = 1;
+		else
+		{
+			exp = s.substr(++pos);
+			ss << exp;
+			ss >> number;
+			if (!(exp.length()) || ss.good() || (number == 0 && exp[0] != '0'))
+				throw Term::TermInvalid();
+			_exponent = number;
+		}
+	}
 	else if (pos == std::string::npos)
 		_exponent = 0;
 	else
@@ -145,18 +160,14 @@ void Term::__check_exponent(std::string &s)
 
 void Term::__check_coefficient(std::string &s)
 {
-	size_t pos = s.find_first_of("*^");
-	std::string coef;
-	std::stringstream ss;
-	t_coef number = 0;
+	size_t pos = s.find_first_of("X*^");
 
-	if (pos == 0 || pos == s.length() - 1)
+	if (pos == 0 && s[pos] == 'X')
+		_coefficient = 1;
+	else if (pos == 0 && s[pos] != 'X')
 		throw Term::TermInvalid();
-	coef = s.substr(0, pos);
-	number = coef;
-	if (!(coef.length()) || (number == 0 && coef[0] != '0'))
-		throw Term::TermInvalid();
-	_coefficient = number;
+	else
+		_coefficient = s.substr(0, pos);
 }
 
 

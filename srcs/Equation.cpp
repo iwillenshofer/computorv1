@@ -6,18 +6,16 @@ const std::string Equation::_parser_chars = "=+-";
 
 // Constructors
 Equation::Equation()
+:_original(""), _degree(-1)
 {
 	std::cout << "\e[0;33mDefault Constructor called of Equation\e[0m" << std::endl;
 }
 
 Equation::Equation(std::string s)
-:_original(s)
+:_original(s), _degree(-1)
 {
-	std::cout << "Starting equation: " << this->_original << std::endl;
 	this->_check_equation(this->_original);
 	this->_parse(this->_original);
-	this->_check_degree();
-	this->_print();
 	this->_switch_rightside();
 	this->_sort();
 	this->_reduce();
@@ -100,15 +98,6 @@ void Equation::_check_equation(std::string &s)
 	this->__ck_invalid_characters(s);
 }
 
-void Equation::_check_degree(void)
-{
-	for (std::vector<Term>::iterator it = _terms.begin(); it != _terms.end(); it++)
-	{
-		if (it->getExponent() >= 3)
-			throw Equation::InvalidDegree();
-	}
-}
-
 /*
 ** Parse
 */
@@ -139,7 +128,8 @@ void Equation::_parse(std::string s)
 
 	while ((pos = s.find_first_of(_parser_chars)) != std::string::npos) {
 		value = s.substr(0, pos);
-		__prs_add_term(value, token, side);
+		if (pos != 0 || (s != _original) || s[0] == '=')
+			__prs_add_term(value, token, side);
 		token = s[pos];
 		if (token == '=')
 		{
@@ -172,6 +162,36 @@ void Equation::_print(void) {
 ** Steps
 */
 
+//clears highest degree with zero coef
+void Equation::__remove_empty_coef(int i)
+{
+	for (std::vector<Term>::iterator it = _terms.begin(); it != _terms.end(); it++)
+	{
+		if (it->getSide() == LEFT_SIDE_TERM && it->getExponent() == i &&
+			(it + 1)->getSide() == RIGHT_SIDE_TERM && it->getCoefficient() == 0.0)
+			_terms.erase(it);
+	}
+}
+
+//add equations for all degrees
+void Equation::__insert_missing_term(int i)
+{
+	std::string term("0*X^");
+	for (std::vector<Term>::iterator it = _terms.begin(); it != _terms.end(); it++)
+	{
+		if (it->getSide() == LEFT_SIDE_TERM && it->getExponent() > i)
+		{
+			term.push_back((i + '0'));
+			_terms.insert(it, Term(term , POSITIVE_TERM, LEFT_SIDE_TERM));	
+			return ;
+		}
+		else if (it->getExponent() == i)
+			return ;
+	}
+}
+
+
+
 void Equation::_switch_rightside(void)
 {
 	for (std::vector<Term>::iterator it = _terms.begin(); it != _terms.end(); it++)
@@ -189,8 +209,9 @@ void Equation::_switch_rightside(void)
 		else 
 			++it;
 	}
+	if (!(_terms.size()))
+		_terms.push_back(Term("0", POSITIVE_TERM, LEFT_SIDE_TERM));
 	_terms.push_back(Term("0", POSITIVE_TERM, RIGHT_SIDE_TERM));
-	_print();
 }
 
 bool Equation::__sort_fn(Term &t1, Term &t2)
@@ -201,7 +222,6 @@ bool Equation::__sort_fn(Term &t1, Term &t2)
 void Equation::_sort()
 {
 	std::sort(_terms.begin(), _terms.end() - 1, Equation::__sort_fn);
-	_print();
 }
 
 bool Equation::__chk_equal_exp()
@@ -247,20 +267,112 @@ void Equation::_reduce()
 			}
 		}
 	}
+	__insert_missing_term(1);
+	__insert_missing_term(0);
+	__remove_empty_coef(2);
+	__remove_empty_coef(1);
+	std::cout << "Reduced Equation: ";
 	_print();
-	if (_terms.size() && _terms[_terms.size() - 2].getExponent() == 2 && _terms[_terms.size() - 2].getCoefficient() == 0)
-	{
-		if (_terms.size() == 2)
-			_terms[_terms.size() - 2].setExponent(0);
-		else
-			_terms.erase(_terms.begin());
-		_print();
-	}	
 }
 
-void Equation::_solve()
+void Equation::_check_degree(void)
 {
-	
+	for (std::vector<Term>::iterator it = _terms.begin(); it != _terms.end(); it++)
+	{
+		if (it->getSide() == LEFT_SIDE_TERM && it->getExponent() > _degree && it->getCoefficient() != 0.0)
+			_degree = it->getExponent();
+	}
+	std::cout << "Polynomial degree: ";
+	if (_degree == -1)
+		std::cout << "undefined";
+	else
+		std::cout << _degree;
+	std::cout << std::endl;
+
+
+	if (_degree >= 3)
+		throw Equation::InvalidDegree();
+}
+
+void Equation::_check_multiple_solutions()
+{
+	for (std::vector<Term>::iterator it = _terms.begin(); it != _terms.end(); it++)
+	{
+		if (it->getSide() == LEFT_SIDE_TERM && it->getCoefficient() > 0.0)
+			return;
+	}
+	throw Equation::MultipleSolutions();
+}
+
+Equation::t_coef Equation::__discriminant(t_coef a, t_coef b, t_coef c)
+{
+	t_coef res = (b * b) - (t_coef(4.0) * a * c);
+	return (res);
+}
+
+void Equation::__baskhara(t_coef a, t_coef b, t_coef discriminant)
+{
+	t_coef x1;
+	t_coef x2;
+	t_coef x1b;
+	t_coef x2b;
+
+	if (discriminant > 0.0)
+	{
+		x1 = ((b * -1.0) - discriminant.sqrt()) / (a * 2.0);
+		x2 = ((b * -1.0) + discriminant.sqrt()) / (a * 2.0);
+		std::cout << x1 << std::endl << x2 << std::endl;
+	}
+	else if (discriminant == 0.0)
+	{
+		x1 = ((b * -1.0)) / (a * 2.0);
+		std::cout << x1 << std::endl;
+	}
+	else
+	{
+		x1 = (b * -1.0  / (a * 2.0));
+		x2 = discriminant.sqrt() / (a * 2.0);
+		std::cout << x1 << " + " << x2 << "i" << std::endl;
+		std::cout << x1 << " - " << x2 << "i" << std::endl;
+	}
+}
+
+void Equation::_solve_quadratic(void)
+{
+	t_coef a = _terms[2].getSignedCoefficient();
+	t_coef b = _terms[1].getSignedCoefficient();
+	t_coef c = _terms[0].getSignedCoefficient();
+	t_coef discriminant = __discriminant(a, b, c);
+
+	if (discriminant > 0.0)
+		std::cout << "Discriminant is strictly positive, the two solutions are:" << std::endl;
+	else if (discriminant == 0.0)
+		std::cout << "Discriminant is zero, the only solution is:" << std::endl;
+	else
+		std::cout << "Discriminant is strictly negative, the two complex solutions are:" << std::endl;
+	__baskhara(a, b, discriminant);
+}
+
+void Equation::_solve_linear(void)
+{
+	Double res;
+
+	res = _terms[0].getCoefficient() / _terms[1].getCoefficient();
+	if (_terms[0].getSignal() == _terms[1].getSignal())
+		res = res * -1.0;
+	std::cout << "Solution:" << std::endl << res << std::endl;
+}
+
+void Equation::_solve(void)
+{
+	this->_check_degree();
+	this->_check_multiple_solutions();
+	if (_degree == 0)
+		throw Equation::NoSolutions();
+	else if (_degree == 1)
+		_solve_linear();
+	else if (_degree == 2)
+		_solve_quadratic();
 }
 
 // Errors
@@ -276,5 +388,15 @@ const char * Equation::InvalidCharacters::what() const throw()
 
 const char * Equation::InvalidDegree::what() const throw()
 {
-	return "Equations of the third degree or higher cannot be solved";
+	return "The polynomial degree is strictly greater than 2, I can't solve.";
+}
+
+const char * Equation::MultipleSolutions::what() const throw()
+{
+	return "Any real number is a solution.";
+}
+
+const char * Equation::NoSolutions::what() const throw()
+{
+	return "There are no solutions for this equation.";
 }
