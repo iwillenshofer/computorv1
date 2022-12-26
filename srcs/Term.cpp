@@ -176,9 +176,9 @@ void Term::__check_op_order(std::string &s)
 	size_t exp = s.find('^');
 	size_t multi = s.find('*');
 	size_t var = s.find('X');
-	bool bexp = s.find('^') != std::string::npos;
-	bool bmulti = s.find('*') != std::string::npos;
-	bool bvar = s.find('X') != std::string::npos;
+	bool bexp = exp != std::string::npos;
+	bool bmulti = multi != std::string::npos;
+	bool bvar = var != std::string::npos;
 	if (bexp && bmulti && bvar && !(exp > var && var > multi))
 		throw Term::TermInvalid();
 	else if (!bvar && (bmulti || bexp))
