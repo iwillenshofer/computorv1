@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Double.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: iwillens <iwillens@student.42.fr>          +#+  +:+       +#+        */
+/*   By: iwillens <iwillens@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/04 11:21:31 by iwillens          #+#    #+#             */
-/*   Updated: 2022/12/25 16:48:45 by iwillens         ###   ########.fr       */
+/*   Updated: 2023/10/06 19:24:44 by iwillens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,11 +127,6 @@ Double			&Double::operator=(Double const &dbl)
 
 void Double::_check_overflow(type &v) const
 {
-//	if (v != v) { std::cout << "NAN" << std::endl; }
-//	if (v == std::numeric_limits<type>::max()) { std::cout << "MAX" << std::endl; }
-//	if (v == std::numeric_limits<type>::min()) { std::cout << "MIN" << std::endl; }
-//	if (v == -std::numeric_limits<type>::infinity()) { std::cout << "-INF" << std::endl; }
-//	if (v == std::numeric_limits<type>::infinity()) { std::cout << "+INF" << std::endl; }
 	if ((v != v) ||
 		v == std::numeric_limits<type>::max() ||
 		v == std::numeric_limits<type>::min() ||
@@ -451,27 +446,6 @@ Double Double::sqrt()
 	while (std::abs(dbl / sqrt - sqrt) > precision)
 		sqrt = (sqrt + dbl / sqrt) / 2.0;
 	return (sqrt);
-}
-
-
-Double			&min(Double &f1, Double &f2)
-{
-	return (f1 > f2 ? f2 : f1);
-}
-
-Double			&max(Double &f1, Double &f2)
-{
-	return (f1 > f2 ? f1 : f2);
-}
-
-Double const		&min(Double const &f1, Double const &f2)
-{
-	return (f1 > f2 ? f2 : f1);
-}
-
-Double const		&max(Double const &f1, Double const &f2)
-{
-	return (f1 > f2 ? f1 : f2);
 }
 
 std::ostream	&operator<<(std::ostream &o, Double const & i)

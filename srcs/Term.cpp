@@ -7,7 +7,6 @@ Term::Term()
 	_exponent = 0;
 	_side = LEFT_SIDE_TERM;
 	_signal = POSITIVE_TERM;
-	std::cout << "\e[0;33mDefault Constructor called of Term\e[0m" << std::endl;
 }
 
 Term::Term(std::string s, char signal = POSITIVE_TERM, char side = LEFT_SIDE_TERM)

@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: iwillens <iwillens@student.42.fr>          +#+  +:+       +#+         #
+#    By: iwillens <iwillens@student.42heilbronn.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/07/23 17:38:02 by iwillens          #+#    #+#              #
-#    Updated: 2022/12/23 16:22:21 by iwillens         ###   ########.fr        #
+#    Updated: 2023/10/06 15:37:46 by iwillens         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -37,11 +37,10 @@ all: ${NAME}
 
 ${NAME}: ${OBJS} ${INCLUDES}
 	@${CC} ${CCFLAGS} ${OBJS} -I. -I ${INC_DIR} -o ${NAME}
-	@echo "\033[92m.${NAME} is built. \033[0m"
+	@echo "\033[92m./${NAME} is built. \033[0m"
 
 ${OBJ_DIR}/%.o: ${SRC_DIR}/%.cpp ${INC_DIR} ${INCLUDES}
 	@mkdir -p $(dir $@)
-	@echo -n "."
 	@${CC} ${CCFLAGS} -MMD -c  $< -I. -I ${INC_DIR} -o $@
 
 clean:

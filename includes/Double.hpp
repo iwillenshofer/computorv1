@@ -86,8 +86,6 @@ class Double
 	bool			operator!=(std::string const &dbl) const;
 
 
-
-
 	Double			operator++();
 	Double			operator++(int);
 	Double			operator--();
@@ -121,10 +119,6 @@ class Double
 
 };
 
-Double				&min(Double &f1, Double &f2);
-Double				&max(Double &f1, Double &f2);
-Double const			&min(Double const &f1, Double const &f2);
-Double const			&max(Double const &f1, Double const &f2);
 std::ostream		&operator<<(std::ostream &o, Double const & i);
 
 #endif

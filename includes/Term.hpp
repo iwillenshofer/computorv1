@@ -15,15 +15,22 @@
 class Term
 {
 	public:
-	
 		typedef Double t_coef;
 		typedef long long int t_exp;
 
-		// Constructors
+	private:
 		Term();
+		t_coef _coefficient;
+		t_exp _exponent;
+		char _side;
+		char _signal;
+		std::string _original;
+
+	public:	
+
+		// Constructors
 		Term(std::string, char, char);
-		Term(const Term &);
-		Term(t_coef, t_exp);
+		Term(const Term &copy);
 		
 		// Destructor
 		~Term();
@@ -64,12 +71,6 @@ class Term
 			virtual const char* what() const throw();
 		};
 		
-	private:
-		t_coef _coefficient;
-		t_exp _exponent;
-		char _side;
-		char _signal;
-		std::string _original;
 };
 
 // << Operator Overload

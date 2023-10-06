@@ -7,9 +7,7 @@ const std::string Equation::_parser_chars = "=+-";
 // Constructors
 Equation::Equation()
 :_original(""), _degree(-1)
-{
-	std::cout << "\e[0;33mDefault Constructor called of Equation\e[0m" << std::endl;
-}
+{ }
 
 Equation::Equation(std::string s)
 :_original(s), _degree(-1)
@@ -24,8 +22,7 @@ Equation::Equation(std::string s)
 
 Equation::Equation(const Equation &copy)
 {
-	(void) copy;
-	std::cout << "\e[0;33mCopy Constructor called of Equation\e[0m" << std::endl;
+	*this = copy;
 }
 
 
@@ -37,9 +34,11 @@ Equation::~Equation()
 
 
 // Operators
-Equation & Equation::operator=(const Equation &assign)
+Equation &Equation::operator=(const Equation &assign)
 {
-	(void) assign;
+	this->_original = assign._original;
+	this->_degree = assign._degree;
+	this->_terms = assign._terms;
 	return *this;
 }
 
@@ -332,8 +331,19 @@ void Equation::__baskhara(t_coef a, t_coef b, t_coef discriminant)
 	{
 		x1 = (b * -1.0  / (a * 2.0));
 		x2 = discriminant.sqrt() / (a * 2.0);
-		std::cout << x1 << " + " << x2 << "i" << std::endl;
-		std::cout << x1 << " - " << x2 << "i" << std::endl;
+		
+		if (x1 != 0.0)
+			std::cout << x1 << " ";
+		if (x2 < 0.0)
+		{
+			std::cout << "-" << (x1 != 0.0 ? " " : "") << x2 * -1 << "i" << std::endl;
+			std::cout << "+" << (x1 != 0.0 ? " " : "") << x2 * -1 << "i" << std::endl;
+		}
+		else
+		{
+			std::cout << "+" << (x1 != 0.0 ? " " : "") << x2 << "i" << std::endl;
+			std::cout << "-" << (x1 != 0.0 ? " " : "") << x2 << "i" << std::endl;
+		}
 	}
 }
 

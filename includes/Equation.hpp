@@ -10,6 +10,8 @@ class Equation
 {
 	private:
 		typedef Term::t_coef	t_coef;
+		
+		Equation();
 		std::string _original;
 		int	_degree;
 		static const std::string _valid_chars;
@@ -18,7 +20,6 @@ class Equation
 
 	public:
 		// Constructors
-		Equation();
 		Equation(std::string s);
 		Equation(const Equation &copy);
 		
@@ -68,8 +69,6 @@ class Equation
 		bool __chk_equal_exp();
 		void __sum_terms(Term &t1, Term &t2);
 		void _reduce();
-
-
 
 
 		/*
