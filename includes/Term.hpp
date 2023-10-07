@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Term.hpp                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: iwillens <iwillens@student.42heilbronn.    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/10/07 10:20:06 by iwillens          #+#    #+#             */
+/*   Updated: 2023/10/07 13:33:53 by iwillens         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef TERM_HPP
 # define TERM_HPP
 
@@ -53,6 +65,7 @@ class Term
 
 		// Parser
 		void __check_duplicates(std::string &s, char c);
+		bool __isnumeric(const std::string& s);
 		void __check_exponent(std::string &s);
 		void __check_coefficient(std::string &s);
 		void __check_op_order(std::string &s);

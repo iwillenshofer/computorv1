@@ -1,9 +1,23 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Equation.hpp                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: iwillens <iwillens@student.42heilbronn.    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/10/07 10:20:10 by iwillens          #+#    #+#             */
+/*   Updated: 2023/10/07 14:39:18 by iwillens         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef EQUATION_HPP
 # define EQUATION_HPP
 
 # include <iostream>
+# include <iomanip>
 # include <string>
 # include <vector>
+# include <algorithm>
 # include "Term.hpp"
 
 class Equation
@@ -63,6 +77,7 @@ class Equation
 		*/
 		void __remove_empty_coef(int i);
 		void __insert_missing_term(int i);
+		void _solve_negatives(void);
 		void _switch_rightside(void);
 		static bool __sort_fn(Term &t1, Term &t2);
 		void _sort();

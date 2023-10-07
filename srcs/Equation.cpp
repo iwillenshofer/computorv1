@@ -1,10 +1,24 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Equation.cpp                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: iwillens <iwillens@student.42heilbronn.    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/10/07 10:19:45 by iwillens          #+#    #+#             */
+/*   Updated: 2023/10/07 14:04:04 by iwillens         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Equation.hpp"
 
 const std::string Equation::_valid_chars = "0123456789 X+-=.^*";
 const std::string Equation::_parser_chars = "=+-";
 
 
-// Constructors
+/*
+** Constructors
+*/
 Equation::Equation()
 :_original(""), _degree(-1)
 { }
@@ -14,6 +28,7 @@ Equation::Equation(std::string s)
 {
 	this->_check_equation(this->_original);
 	this->_parse(this->_original);
+	this->_solve_negatives();
 	this->_switch_rightside();
 	this->_sort();
 	this->_reduce();
@@ -25,15 +40,17 @@ Equation::Equation(const Equation &copy)
 	*this = copy;
 }
 
-
-// Destructor
+/*
+** Destructor
+*/
 Equation::~Equation()
 {
 	_terms.clear();
 }
 
-
-// Operators
+/*
+** Operators
+*/
 Equation &Equation::operator=(const Equation &assign)
 {
 	this->_original = assign._original;
@@ -43,9 +60,8 @@ Equation &Equation::operator=(const Equation &assign)
 }
 
 /*
-** Checkers
+** helper for validate character function
 */
-
 bool Equation::___is_valid_char(char &c) const
 {
 	for(std::string::const_iterator vit = Equation::_valid_chars.begin(); vit != Equation::_valid_chars.end(); vit++)
@@ -56,6 +72,9 @@ bool Equation::___is_valid_char(char &c) const
 	return (false);
 }
 
+/*
+** validates characters
+*/
 void Equation::__ck_invalid_characters(std::string &s)
 {
 	for(std::string::iterator it = s.begin(); it != s.end(); it++)
@@ -66,6 +85,9 @@ void Equation::__ck_invalid_characters(std::string &s)
 	}
 }
 
+/*
+** check for two '=' signs
+*/
 void Equation::__ck_double_equal(std::string &s) const
 {
 	int count = 0;
@@ -78,6 +100,9 @@ void Equation::__ck_double_equal(std::string &s) const
 		throw Equation::EquationInvalid();
 }
 
+/*
+** remove spaces
+*/
 void Equation::__ck_double_spaces(std::string &s)
 {
 	std::size_t double_space = s.find(" ");
@@ -90,6 +115,9 @@ void Equation::__ck_double_spaces(std::string &s)
 		throw Equation::EquationInvalid();
 }
 
+/*
+** validate equation
+*/
 void Equation::_check_equation(std::string &s)
 {
 	this->__ck_double_spaces(s);
@@ -98,9 +126,8 @@ void Equation::_check_equation(std::string &s)
 }
 
 /*
-** Parse
+** simple pushback function to add terms
 */
-
 void Equation::__prs_add_term(std::string value, char token, char side)
 {
 	char signal = POSITIVE_TERM;
@@ -118,6 +145,34 @@ void Equation::__prs_add_term(std::string value, char token, char side)
 	}
 }
 
+/*
+** converts negative exponents into positive
+*/
+void Equation::_solve_negatives()
+{
+	long long int min;
+	long long int exp;
+
+	min = 0;
+	exp = 0;
+	for (std::vector<Term>::iterator it = _terms.begin(); it != _terms.end(); it++)
+	{
+		exp = it->getExponent();
+		if (exp < min)
+			min = exp;
+	}
+	if (min >= 0)
+		return;
+	min *= -1;
+	for (std::vector<Term>::iterator it = _terms.begin(); it != _terms.end(); it++)
+	{
+		it->setExponent(it->getExponent() + min);
+	}
+}
+
+/*
+** parses user input
+*/
 void Equation::_parse(std::string s)
 {
 	std::size_t pos = 0;
@@ -125,7 +180,14 @@ void Equation::_parse(std::string s)
 	std::string value = "";
 	char side = LEFT_SIDE_TERM;
 
-	while ((pos = s.find_first_of(_parser_chars)) != std::string::npos) {
+	while ((pos = s.find_first_of(_parser_chars)) != std::string::npos)
+	{
+		if (pos && s[pos - 1] == '^' && (s[pos] == '+' || s[pos] == '-'))
+		{
+			pos = s.find_first_of(_parser_chars, pos + 1);
+			if (pos == std::string::npos)
+				pos = s.length() - 1; 
+		}
 		value = s.substr(0, pos);
 		if (pos != 0 || (s != _original) || s[0] == '=')
 			__prs_add_term(value, token, side);
@@ -140,6 +202,10 @@ void Equation::_parse(std::string s)
 	__prs_add_term(s, token, side);
 }
 
+/*
+** prints every term of the equation.
+** used for printing the reduced form
+*/
 void Equation::_print(void) {
 	bool right_side = false;
 	bool show_pos_sign = false;
@@ -158,10 +224,8 @@ void Equation::_print(void) {
 }
 
 /*
-** Steps
+** removes empty coefficient if it is the left left term
 */
-
-//clears highest degree with zero coef
 void Equation::__remove_empty_coef(int i)
 {
 	for (std::vector<Term>::iterator it = _terms.begin(); it != _terms.end(); it++)
@@ -172,7 +236,9 @@ void Equation::__remove_empty_coef(int i)
 	}
 }
 
-//add equations for all degrees
+/*
+** add empty terms for all degrees
+*/
 void Equation::__insert_missing_term(int i)
 {
 	std::string term("0*X^");
@@ -189,8 +255,9 @@ void Equation::__insert_missing_term(int i)
 	}
 }
 
-
-
+/*
+** sends right side term to the left
+*/
 void Equation::_switch_rightside(void)
 {
 	for (std::vector<Term>::iterator it = _terms.begin(); it != _terms.end(); it++)
@@ -213,16 +280,25 @@ void Equation::_switch_rightside(void)
 	_terms.push_back(Term("0", POSITIVE_TERM, RIGHT_SIDE_TERM));
 }
 
+/*
+** sorting helper function, by exponent degree
+*/
 bool Equation::__sort_fn(Term &t1, Term &t2)
 {
     return (t1.getExponent() < t2.getExponent());
 }
 
+/*
+** simple sorting
+*/
 void Equation::_sort()
 {
 	std::sort(_terms.begin(), _terms.end() - 1, Equation::__sort_fn);
 }
 
+/*
+** checks if we have repeated exponents (same degree)
+*/
 bool Equation::__chk_equal_exp()
 {
 	int count = 0;
@@ -239,6 +315,9 @@ bool Equation::__chk_equal_exp()
 	return (false);
 }
 
+/*
+** sum terms with the same exponent
+*/
 void Equation::__sum_terms(Term &t1, Term &t2)
 {
 	if (t1.getSignal() == t2.getSignal())
@@ -252,6 +331,9 @@ void Equation::__sum_terms(Term &t1, Term &t2)
 		t1.setCoefficient(t1.getCoefficient() - t2.getCoefficient());
 }
 
+/*
+** reduce the equation to at most three terms
+*/
 void Equation::_reduce()
 {
 	while (__chk_equal_exp())
@@ -274,6 +356,9 @@ void Equation::_reduce()
 	_print();
 }
 
+/*
+** Checks degrees of equation after reducing
+*/
 void Equation::_check_degree(void)
 {
 	for (std::vector<Term>::iterator it = _terms.begin(); it != _terms.end(); it++)
@@ -287,12 +372,14 @@ void Equation::_check_degree(void)
 	else
 		std::cout << _degree;
 	std::cout << std::endl;
-
-
 	if (_degree >= 3)
 		throw Equation::InvalidDegree();
 }
 
+/*
+** if the Coefficient of any term is > 0 after reducing,
+** the equation does not have multiple solutions
+*/
 void Equation::_check_multiple_solutions()
 {
 	for (std::vector<Term>::iterator it = _terms.begin(); it != _terms.end(); it++)
@@ -303,12 +390,18 @@ void Equation::_check_multiple_solutions()
 	throw Equation::MultipleSolutions();
 }
 
+/*
+** simple discriminant equation, according to the quadratic formula
+*/
 Equation::t_coef Equation::__discriminant(t_coef a, t_coef b, t_coef c)
 {
 	t_coef res = (b * b) - (t_coef(4.0) * a * c);
 	return (res);
 }
 
+/*
+** quadratic formula
+*/
 void Equation::__baskhara(t_coef a, t_coef b, t_coef discriminant)
 {
 	t_coef x1;
@@ -320,33 +413,26 @@ void Equation::__baskhara(t_coef a, t_coef b, t_coef discriminant)
 	{
 		x1 = ((b * -1.0) - discriminant.sqrt()) / (a * 2.0);
 		x2 = ((b * -1.0) + discriminant.sqrt()) / (a * 2.0);
-		std::cout << x1 << std::endl << x2 << std::endl;
+		std::cout << std::setprecision(6) << std::fixed << x1 << std::endl;
+		std::cout << std::setprecision(6) << std::fixed << x2 << std::endl;
 	}
 	else if (discriminant == 0.0)
 	{
 		x1 = ((b * -1.0)) / (a * 2.0);
-		std::cout << x1 << std::endl;
+		std::cout << std::setprecision(6) << std::fixed << x1 << std::endl;
 	}
 	else
 	{
 		x1 = (b * -1.0  / (a * 2.0));
 		x2 = discriminant.sqrt() / (a * 2.0);
-		
-		if (x1 != 0.0)
-			std::cout << x1 << " ";
-		if (x2 < 0.0)
-		{
-			std::cout << "-" << (x1 != 0.0 ? " " : "") << x2 * -1 << "i" << std::endl;
-			std::cout << "+" << (x1 != 0.0 ? " " : "") << x2 * -1 << "i" << std::endl;
-		}
-		else
-		{
-			std::cout << "+" << (x1 != 0.0 ? " " : "") << x2 << "i" << std::endl;
-			std::cout << "-" << (x1 != 0.0 ? " " : "") << x2 << "i" << std::endl;
-		}
+		std::cout << std::setprecision(6) << std::fixed << x1 << " + " << std::setprecision(6) << std::fixed << x2 << "i" << std::endl;
+		std::cout << std::setprecision(6) << std::fixed << x1 << " - " << std::setprecision(6) << std::fixed << x2 << "i" << std::endl;
 	}
 }
 
+/*
+** solves 2nd degree equation
+*/
 void Equation::_solve_quadratic(void)
 {
 	t_coef a = _terms[2].getSignedCoefficient();
@@ -363,6 +449,9 @@ void Equation::_solve_quadratic(void)
 	__baskhara(a, b, discriminant);
 }
 
+/*
+** solve 1st degree equation
+*/
 void Equation::_solve_linear(void)
 {
 	Double res;
@@ -370,9 +459,12 @@ void Equation::_solve_linear(void)
 	res = _terms[0].getCoefficient() / _terms[1].getCoefficient();
 	if (_terms[0].getSignal() == _terms[1].getSignal())
 		res = res * -1.0;
-	std::cout << "Solution:" << std::endl << res << std::endl;
+	std::cout << "Solution:" << std::endl << std::setprecision(6) << std::fixed << res << std::endl;
 }
 
+/*
+** solves the equation depending on its degree
+*/
 void Equation::_solve(void)
 {
 	this->_check_degree();
@@ -385,7 +477,9 @@ void Equation::_solve(void)
 		_solve_quadratic();
 }
 
-// Errors
+/*
+** Errors
+*/
 const char * Equation::EquationInvalid::what() const throw()
 {
 	return "This equation is invalid";

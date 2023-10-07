@@ -1,6 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Term.cpp                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: iwillens <iwillens@student.42heilbronn.    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/10/07 10:19:36 by iwillens          #+#    #+#             */
+/*   Updated: 2023/10/07 14:05:17 by iwillens         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Term.hpp"
 
-// Constructors
+/*
+** Constructors
+*/
 Term::Term()
 {
 	_coefficient = 0;
@@ -24,11 +38,15 @@ Term::Term(const Term &copy)
 	_original = copy.getOriginal();
 }
 
-// Destructor
+/*
+** Destructor
+*/
 Term::~Term() {}
 
+/*
+** Operators
+*/
 
-// Operators
 Term & Term::operator=(const Term &assign)
 {
 	_coefficient = assign.getCoefficient();
@@ -40,9 +58,9 @@ Term & Term::operator=(const Term &assign)
 }
 
 
-// Getters / Setters
-
-
+/*
+** Getters / Setters
+*/
 Term::t_coef Term::getSignedCoefficient() const
 {
 	return _coefficient * (_signal == POSITIVE_TERM ? 1.0 : -1.0);
@@ -93,6 +111,9 @@ std::string Term::getOriginal() const
 	return _original;
 }
 
+/*
+** converts term into string
+*/
 std::string Term::toString(bool show_positive_sign) const
 {
 	std::string s;
@@ -100,7 +121,7 @@ std::string Term::toString(bool show_positive_sign) const
 	if (this->getSignal() == NEGATIVE_TERM || show_positive_sign)
 		s += (this->getSignal() == POSITIVE_TERM ? "+ " : "- ");
 	s += this->_to_string<t_coef>(this->getCoefficient());
-	if (!(this->getExponent()) && !(this->getCoefficient()) && this->getOriginal() == "0" && this->getSide() == RIGHT_SIDE_TERM)
+	if (!(this->getExponent()) && (this->getOriginal().find('X') == std::string::npos || this->getSide() == RIGHT_SIDE_TERM))
 		return (s + " ");
 	s += " * X ^ ";
 	s += this->_to_string<t_exp>(this->getExponent()) + " ";
@@ -120,11 +141,30 @@ void Term::__check_duplicates(std::string &s, char c)
 		throw Term::TermInvalid();
 }
 
+bool Term::__isnumeric(const std::string& s)
+{
+	std::string::const_iterator it = s.begin();
+
+	if (!(s.length()))
+		return false;
+	if (*it == '+' || *it == '-')
+		it++;
+    for (; it != s.end(); it++)
+	{
+		if (*it > '9' || *it < '0')
+			return false;
+	}
+	return true;
+}
+
+/*
+** validates the exponent.
+** it can't be the first or last token.
+*/
 void Term::__check_exponent(std::string &s)
 {
 	size_t pos = s.find('^');
 	std::string exp;
-	std::stringstream ss;
 	t_exp number = 0;
 
 	if (pos == 0 || pos == s.length() - 1)
@@ -137,9 +177,8 @@ void Term::__check_exponent(std::string &s)
 		else
 		{
 			exp = s.substr(++pos);
-			ss << exp;
-			ss >> number;
-			if (!(exp.length()) || ss.good() || (number == 0 && exp[0] != '0'))
+			number = std::atoll(exp.c_str());
+			if (!(exp.length()) || !(__isnumeric(exp)) || (number == 0 && exp[0] != '0'))
 				throw Term::TermInvalid();
 			_exponent = number;
 		}
@@ -149,14 +188,17 @@ void Term::__check_exponent(std::string &s)
 	else
 	{
 		exp = s.substr(++pos);
-      	ss << exp;
-		ss >> number;
-		if (!(exp.length()) || ss.good() || (number == 0 && exp[0] != '0'))
+		number = std::atoll(exp.c_str());
+		if (!(exp.length()) || !(__isnumeric(exp)) || (number == 0 && exp[0] != '0'))
 			throw Term::TermInvalid();
 		_exponent = number;
 	}
 }
 
+/*
+** coefficient may be ommited, but only if the term
+** starts with X.
+*/
 void Term::__check_coefficient(std::string &s)
 {
 	size_t pos = s.find_first_of("X*^");
@@ -169,7 +211,10 @@ void Term::__check_coefficient(std::string &s)
 		_coefficient = s.substr(0, pos);
 }
 
-
+/*
+** Makes sure the tokens are in the right order:
+**  coef * X ^ exp
+*/
 void Term::__check_op_order(std::string &s)
 {
 	size_t exp = s.find('^');
@@ -188,7 +233,9 @@ void Term::__check_op_order(std::string &s)
 		throw Term::TermInvalid();
 }
 
-
+/*
+** Term Parsing and verification
+*/
 void Term::_parse(std::string &s)
 {
 	__check_duplicates(s, 'X');
@@ -200,13 +247,17 @@ void Term::_parse(std::string &s)
 
 }
 
-// Exceptions
+/*
+** Exceptions
+*/
 const char * Term::TermInvalid::what() const throw()
 {
 	return "Invalid Term";
 }
 
-// <<
+/*
+** ostream overload, for term debugging
+*/
 std::ostream& operator<<(std::ostream& o, const Term& term)
 {
 	o << "\e[0;35m";
