@@ -6,7 +6,7 @@
 /*   By: iwillens <iwillens@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/07 10:20:10 by iwillens          #+#    #+#             */
-/*   Updated: 2023/10/07 14:39:18 by iwillens         ###   ########.fr       */
+/*   Updated: 2023/10/07 14:44:09 by iwillens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,12 +43,9 @@ class Equation
 		// Operators
 		Equation & operator=(const Equation &assign);
 
-
-
 		/*
 		** Checkers
 		*/
-
 		bool ___is_valid_char(char &c) const;
 
 		void __ck_invalid_characters(std::string &s);
@@ -63,7 +60,6 @@ class Equation
 		/*
 		** Parse
 		*/
-
 		void __prs_add_term(std::string value, char token, char side);
 
 		void _parse(std::string s);
@@ -85,7 +81,6 @@ class Equation
 		void __sum_terms(Term &t1, Term &t2);
 		void _reduce();
 
-
 		/*
 		** Solve
 		*/
@@ -102,12 +97,15 @@ class Equation
 		class EquationInvalid : public std::exception {
 			virtual const char* what() const throw();
 		};
+
 		class InvalidCharacters : public std::exception {
 			virtual const char* what() const throw();
 		};
+
 		class InvalidDegree : public std::exception {
 			virtual const char* what() const throw();
 		};
+
 		class MultipleSolutions : public std::exception {
 			virtual const char* what() const throw();
 		};
