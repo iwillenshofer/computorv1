@@ -6,7 +6,7 @@
 /*   By: iwillens <iwillens@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/07 10:20:15 by iwillens          #+#    #+#             */
-/*   Updated: 2023/10/07 10:20:22 by iwillens         ###   ########.fr       */
+/*   Updated: 2023/10/07 15:15:30 by iwillens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,9 @@
 # define DOUBLE_HPP
 
 # include <iostream>
+# include <iomanip>
+# include <string>
+# include <sstream>
 # include <limits>
 # include <cstdlib>
 

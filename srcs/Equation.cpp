@@ -6,7 +6,7 @@
 /*   By: iwillens <iwillens@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/07 10:19:45 by iwillens          #+#    #+#             */
-/*   Updated: 2023/10/07 14:04:04 by iwillens         ###   ########.fr       */
+/*   Updated: 2023/10/07 15:52:16 by iwillens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -413,20 +413,20 @@ void Equation::__baskhara(t_coef a, t_coef b, t_coef discriminant)
 	{
 		x1 = ((b * -1.0) - discriminant.sqrt()) / (a * 2.0);
 		x2 = ((b * -1.0) + discriminant.sqrt()) / (a * 2.0);
-		std::cout << std::setprecision(6) << std::fixed << x1 << std::endl;
-		std::cout << std::setprecision(6) << std::fixed << x2 << std::endl;
+		std::cout << x1 << std::endl;
+		std::cout << x2 << std::endl;
 	}
 	else if (discriminant == 0.0)
 	{
 		x1 = ((b * -1.0)) / (a * 2.0);
-		std::cout << std::setprecision(6) << std::fixed << x1 << std::endl;
+		std::cout << x1 << std::endl;
 	}
 	else
 	{
 		x1 = (b * -1.0  / (a * 2.0));
 		x2 = discriminant.sqrt() / (a * 2.0);
-		std::cout << std::setprecision(6) << std::fixed << x1 << " + " << std::setprecision(6) << std::fixed << x2 << "i" << std::endl;
-		std::cout << std::setprecision(6) << std::fixed << x1 << " - " << std::setprecision(6) << std::fixed << x2 << "i" << std::endl;
+		std::cout << x1 << " + " <<  (x2 >= 0.0 ? x2 : x2 * -1) << "i" << std::endl;
+		std::cout << x1 << " - " <<  (x2 >= 0.0 ? x2 : x2 * -1) << "i" << std::endl;
 	}
 }
 
@@ -459,7 +459,7 @@ void Equation::_solve_linear(void)
 	res = _terms[0].getCoefficient() / _terms[1].getCoefficient();
 	if (_terms[0].getSignal() == _terms[1].getSignal())
 		res = res * -1.0;
-	std::cout << "Solution:" << std::endl << std::setprecision(6) << std::fixed << res << std::endl;
+	std::cout << "Solution:" << std::endl << res << std::endl;
 }
 
 /*

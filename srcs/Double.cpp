@@ -6,7 +6,7 @@
 /*   By: iwillens <iwillens@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/04 11:21:31 by iwillens          #+#    #+#             */
-/*   Updated: 2023/10/07 10:20:27 by iwillens         ###   ########.fr       */
+/*   Updated: 2023/10/07 15:25:15 by iwillens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,9 @@ void Double::_isvalidfloat(std::string &s)
 	}
 }
 
+/*
+** converts string to double
+*/
 Double::type Double::_str_to_double(std::string &nb)
 {
 	type number;
@@ -134,7 +137,6 @@ void Double::_check_overflow(type &v) const
 		v == std::numeric_limits<type>::infinity())
 		throw Double::NumberOverflow();
 }
-
 
 Double			Double::operator+(Double const &dbl) const
 {
@@ -396,7 +398,6 @@ bool			Double::operator!=(std::string const &dbl) const
 }
 
 
-
 Double			Double::operator++(void)
 {
 	this->_dbl++;
@@ -450,7 +451,25 @@ Double Double::sqrt()
 
 std::ostream	&operator<<(std::ostream &o, Double const & i)
 {
-	return (o << (i.value() == -0.0 ? 0.0 : i.value()));
+    std::stringstream ss;
+    std::string str;
+	size_t dot;
+
+	o << str;
+
+    ss << std::fixed << std::setprecision(6) << i.value();
+	str = ss.str();
+	dot = str.find('.');
+	if (dot != std::string::npos)
+	{
+		while (*(str.rbegin()) == '0')
+			str.pop_back();
+		if (*(str.rbegin()) == '.')
+			str.pop_back();
+	}
+	if (str == "-0")
+		return (o << "0");	
+	return (o << str);
 }
 
 const char * Double::InvalidCharacters::what() const throw()
